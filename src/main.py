@@ -1,11 +1,11 @@
-import asyncio
+import uvicorn
+from fastapi import FastAPI
 
-from transactions.insert_data import insert_users, insert_documents
-from transactions.retrieve_data import retrieve_data
-from db.base import AsyncSessionLocal
+from routers.documents import router
 
-if __name__ == '__main__':
-    pass
-    #asyncio.run(insert_users(AsyncSessionLocal))
-    #asyncio.run(retrieve_data(AsyncSessionLocal))
-    #asyncio.run(insert_documents(AsyncSessionLocal))
+app = FastAPI()
+
+app.include_router(router)
+
+if __name__ == "__main__":
+    uvicorn.run(app="main:app", host= "0.0.0.0", port=8000, reload=True)
