@@ -3,8 +3,16 @@ from sqlalchemy import select, desc
 
 from models.documents import *
 
-async def upload_picture(async_session: async_sessionmaker[AsyncSession], filename: str, ) -> None:
-    pass
+async def upload_picture(async_session: async_sessionmaker[AsyncSession], file_id: str, file_path: str) -> None:
+    async with async_session() as session:
+        async with session.begin():
+            stmt = DocumentPicture(
+                id=file_id,
+                psth=file_path,
+            )
+            session.add(
+                stmt
+            )
 
 # async def insert_users(async_session: async_sessionmaker[AsyncSession]) -> None:
 #     async with async_session() as session:

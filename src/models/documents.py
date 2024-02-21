@@ -14,13 +14,14 @@ class DocumentPicture(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     psth: Mapped[str] = mapped_column(String(), nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(server_default=func.now())
-    related_text: Mapped['DocumentsText'] = relationship(back_populates="picture_id")
+    related_text: Mapped['DocumentsText'] = relationship(back_populates="related_picture")
 
 class DocumentsText(Base):
     __tablename__ = "texts"
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     picture_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("docs_pics.id"))
     text: Mapped[str] = mapped_column(String(), nullable=False)
+    related_picture: Mapped['DocumentPicture'] = relationship(back_populates="related_text")
 
  
 
