@@ -1,11 +1,14 @@
+from fastapi import File, UploadFile
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from sqlalchemy import select, desc
 
 from models.documents import *
+from utils.save_picture import save_picture
 
-async def upload_picture(async_session: async_sessionmaker[AsyncSession], file_id: str, file_path: str) -> None:
+async def upload_picture(async_session: async_sessionmaker[AsyncSession], file_id: str, file_path: str, picture: UploadFile = File(...)) -> None:
     async with async_session() as session:
         async with session.begin():
+            await save_picture(file_path=file_path, picture=picture)
             stmt = DocumentPicture(
                 id=file_id,
                 psth=file_path,
