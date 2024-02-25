@@ -1,9 +1,11 @@
 from fastapi import File, UploadFile
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from models.documents import *
 from utils.save_picture import save_picture
+from utils.analyze_picture import analyze_picture
 
 async def upload_picture(async_session: async_sessionmaker[AsyncSession], file_id: str, file_path: str, picture: UploadFile = File(...)) -> None:
     async with async_session() as session:
@@ -17,23 +19,18 @@ async def upload_picture(async_session: async_sessionmaker[AsyncSession], file_i
                 stmt
             )
 
-# async def insert_users(async_session: async_sessionmaker[AsyncSession]) -> None:
-#     async with async_session() as session:
-#         async with session.begin():
-#             session.add_all([
-#                 # User(nickname='Username 1'),
-#                 # User(nickname='Username 2'),
-#                 # User(nickname='Username 3'),
-#                 # User(nickname='Username 4'),
-#                 User(nickname='Username 6'),
-#             ])
+async def add_text(async_session: async_sessionmaker[AsyncSession], picture_id: str):
+    async with async_session() as session:
+        async with session.begin():
+            stmt = select(DocumentPicture).options(joinedload(DocumentPicture.related_text)).where(DocumentPicture.id==picture_id)
+            result = await session.execute(stmt)
+            document_text = result.scalars().first()
+            filepath = str(document_text.psth)
 
-# async def insert_documents(async_session: async_sessionmaker[AsyncSession]) -> None:
-#     async with async_session() as session:
-#         async with session.begin():
-#             stmt = select(User.id).limit(1).order_by(desc(User.id))
-#             result = await session.execute(stmt)
-#             user_id = result.scalars().first()
-#             session.add(
-#                 Document(text=f'Some text by {user_id}', user_id=user_id)
-#             )
+            if not document_text.related_text:
+                text = await analyze_picture(filepath)
+                add_text = DocumentsText(
+                    picture_id=picture_id,
+                    text=text,
+                )
+                session.add(add_text)

@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, status, HTTPException
 from fastapi.responses import FileResponse
 
-from transactions.insert_data import upload_picture
+from transactions.insert_data import upload_picture, add_text
 from transactions.delete_data import delete_picture
 from db.base import AsyncSessionLocal
 
@@ -34,6 +34,16 @@ async def delete_file(id: str):
         await delete_picture(
             async_session=AsyncSessionLocal,
             id=id,
+        )
+    except:
+        raise Exception
+    
+@router.post("/doc_analyze")
+async def doc_analyze(id: str):
+    try:
+        await add_text(
+            async_session=AsyncSessionLocal,
+            picture_id=id,
         )
     except:
         raise Exception
