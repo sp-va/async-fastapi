@@ -21,7 +21,7 @@ class DocumentsText(Base):
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     picture_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("docs_pics.id"))
     text: Mapped[str] = mapped_column(String(), nullable=False)
-    related_picture: Mapped['DocumentPicture'] = relationship(back_populates="related_text")
+    related_picture: Mapped['DocumentPicture'] = relationship(back_populates="related_text", cascade="delete")
 
  
 
