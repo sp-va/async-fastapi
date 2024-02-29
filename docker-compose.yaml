@@ -2,32 +2,51 @@ version: "3"
 
 services:
 
-  fastapi:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: fastapi
-    command: python src/main.py
-    ports:
-      - "8000:8000"
-    depends_on:
-      - database
+  # fastapi:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: fastapi
+  #   command: sh -c "
+  #     alembic upgrade head &&
+  #     python src/main.py
+  #     "
+    
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - database
+  #     - rabbitmq
 
 
-  database:
-    image: postgres:13
-    environment:
-      DATABASE_HOST: ${DATABASE_HOST}
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USER: ${DATABASE_USER}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      
+  # database:
+  #   image: postgres:13
+  #   environment:
+  #     - POSTGRES_HOST=${DATABASE_HOST}
+  #     - POSTGRES_PORT=${DATABASE_PORT}
+  #     - POSTGRES_DB=${DATABASE_NAME}
+  #     - POSTGRES_USER=${DATABASE_USER}
+  #     - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+  #     - POSTGRES_HOST_AUTH_METHOD=trust
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   container_name: database
+  
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
     ports:
-      - "5432:5432"
+      - 5672:5672
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - rabbitmq:/var/lib/rabbitmq/
+    container_name: rabbitmq
+
+
 
 volumes:
-  postgres_data:
+  # postgres_data:
+  rabbitmq:
 

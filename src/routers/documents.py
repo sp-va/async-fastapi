@@ -2,11 +2,11 @@ from uuid import uuid4
 from pathlib import Path
 
 from fastapi import APIRouter, UploadFile, File, status, HTTPException
-from fastapi.responses import FileResponse
 
-from transactions.insert_data import upload_picture, add_text
+from transactions.insert_data import upload_picture
 from transactions.delete_data import delete_picture
 from db.base import AsyncSessionLocal
+from celery_worker.tasks import add_text
 
 router = APIRouter(
     prefix="/documents",
@@ -39,11 +39,11 @@ async def delete_file(id: str):
         raise Exception
     
 @router.post("/doc_analyze")
-async def doc_analyze(id: str):
+def doc_analyze(id: str):
     try:
-        await add_text(
-            async_session=AsyncSessionLocal,
+        add_text.delay(
             picture_id=id,
         )
+        return {"text": "Информация будет добавлена в БД"}
     except:
         raise Exception
