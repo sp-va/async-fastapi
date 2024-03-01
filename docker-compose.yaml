@@ -9,13 +9,21 @@ services:
   #   container_name: fastapi
   #   command: sh -c "
   #     alembic upgrade head &&
-  #     python src/main.py
-  #     "
+  #     python src/main.py"
     
   #   ports:
-  #     - "8000:8000"
+  #     - 8000:8000
   #   depends_on:
   #     - database
+  #     - rabbitmq
+  #    - worker
+
+  # worker:
+  #   build: 
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: python -m celery -A src.celery_worker.tasks worker
+  #   depends_on:
   #     - rabbitmq
 
 
@@ -28,8 +36,11 @@ services:
   #     - POSTGRES_USER=${DATABASE_USER}
   #     - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
   #     - POSTGRES_HOST_AUTH_METHOD=trust
+  #   hostname: database
   #   ports:
-  #     - "5432:5432"
+  #     - 5432:5432
+  #   expose:
+  #     - 5432
   #   volumes:
   #     - postgres_data:/var/lib/postgresql/data
   #   container_name: database
@@ -40,6 +51,8 @@ services:
     hostname: rabbitmq
     ports:
       - 5672:5672
+    expose:
+      - 5672
     volumes:
       - rabbitmq:/var/lib/rabbitmq/
     container_name: rabbitmq
