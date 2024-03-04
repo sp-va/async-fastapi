@@ -2,64 +2,58 @@ version: "3"
 
 services:
 
-  # fastapi:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   container_name: fastapi
-  #   command: sh -c "
-  #     alembic upgrade head &&
-  #     python src/main.py"
-    
-  #   ports:
-  #     - 8000:8000
-  #   depends_on:
-  #     - database
-  #     - rabbitmq
-  #    - worker
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-container
+    command: sh -c "
+       python src/main.py"
+    depends_on:
+      - database
+      - rabbitmq
+      - worker
 
-  # worker:
-  #   build: 
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   command: python -m celery -A src.celery_worker.tasks worker
-  #   depends_on:
-  #     - rabbitmq
+  worker:
+    build:
+     context: .
+     dockerfile: Dockerfile
+    command: python -m celery -A src.celery_config worker
+    depends_on:
+     - rabbitmq
 
 
-  # database:
-  #   image: postgres:13
-  #   environment:
-  #     - POSTGRES_HOST=${DATABASE_HOST}
-  #     - POSTGRES_PORT=${DATABASE_PORT}
-  #     - POSTGRES_DB=${DATABASE_NAME}
-  #     - POSTGRES_USER=${DATABASE_USER}
-  #     - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-  #     - POSTGRES_HOST_AUTH_METHOD=trust
-  #   hostname: database
-  #   ports:
-  #     - 5432:5432
-  #   expose:
-  #     - 5432
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   container_name: database
-  
+  database:
+     image: postgres:13
+     environment:
+       - POSTGRES_HOST=${DATABASE_HOST}
+       - POSTGRES_PORT=${DATABASE_PORT}
+       - POSTGRES_DB=${DATABASE_NAME}
+       - POSTGRES_USER=${DATABASE_USER}
+       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+       - POSTGRES_HOST_AUTH_METHOD=trust
+     hostname: database
+     ports:
+       - "5432:5432"
+     expose:
+       - 5432
+     volumes:
+       - postgres_data:/var/lib/postgresql/data
+     container_name: database
+
 
   rabbitmq:
-    image: rabbitmq:3.10.7-management
-    hostname: rabbitmq
-    ports:
-      - 5672:5672
-    expose:
-      - 5672
-    volumes:
-      - rabbitmq:/var/lib/rabbitmq/
-    container_name: rabbitmq
-
-
+     image: rabbitmq:3.10.7-management
+     hostname: rabbitmq
+     ports:
+       - "5672:5672"
+     expose:
+       - 5672
+     volumes:
+       - rabbitmq:/var/lib/rabbitmq/
+     container_name: rabbitmq
 
 volumes:
-  # postgres_data:
-  rabbitmq:
+   postgres_data:
+   rabbitmq:
 

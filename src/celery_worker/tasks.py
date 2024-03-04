@@ -1,15 +1,11 @@
-from celery import Celery
-
 import pytesseract
 from PIL import Image
-from datetime import time
+import time
 
-app = Celery(
-    "tasks",
-    broker="pyamqp://vadim:qwerasdf@localhost:5672/myvhost",
-)
+from ..celery_config import worker
 
-@app.task
+
+@worker.task(name="celery_worker.tasks.analyze_picture")
 def analyze_picture(file_path: str):
     text = pytesseract.image_to_string(Image.open(file_path), lang="rus+eng")
     time.sleep(5)

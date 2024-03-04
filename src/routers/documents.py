@@ -3,11 +3,10 @@ from pathlib import Path
 
 from fastapi import APIRouter, UploadFile, File, status, HTTPException
 
-from transactions.insert_data import upload_picture, add_text
+from transactions.insert_data import upload_picture
 from transactions.retrieve_data import is_text_analyzed
 from transactions.delete_data import delete_picture
 from db.base import AsyncSessionLocal
-from celery_worker.tasks import analyze_picture
 
 router = APIRouter(
     prefix="/documents",
@@ -39,17 +38,17 @@ async def delete_file(id: str):
     except:
         raise Exception
     
-@router.post("/doc_analyze")
-async def doc_analyze(id: str):
-    try:
-        document_data = await is_text_analyzed(async_session=AsyncSessionLocal, picture_id=id)
-        
-        if not document_data.related_text:
-            text = analyze_picture.delay(file_path=document_data.psth)
-            result = text.get()
-            add_text.delay(
-                picture_id=id,
-                text=result
-            )
-    except:
-        raise Exception
+# @router.post("/doc_analyze")
+# async def doc_analyze(id: str):
+#     try:
+#         document_data = await is_text_analyzed(async_session=AsyncSessionLocal, picture_id=id)
+#
+#         if not document_data.related_text:
+#             text = analyze_picture.delay(file_path=document_data.psth)
+#             result = text.get()
+#             add_text.delay(
+#                 picture_id=id,
+#                 text=result
+#             )
+#     except:
+#         raise Exception
