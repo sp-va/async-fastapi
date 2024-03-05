@@ -22,7 +22,8 @@ def add_text(picture_id: str, text: str):
     sync_session = SessionLocal
     with sync_session() as session:
         with session.begin():
-            stmt = insert(DocumentsText).values(picture_id=picture_id, text=text,)
-            stmt = stmt.on_conflict_do_update()
-            session.execute(stmt)
+            stmt = DocumentsText(
+                picture_id=picture_id, text=text
+            )
+            session.add(stmt)
     

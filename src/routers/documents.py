@@ -41,7 +41,7 @@ async def delete_file(picture_id: str):
 @router.post("/doc_analyze")
 async def doc_analyze(id: str):
     try:
-        analyze_picture(picture_id=id)
+        analyze_picture.delay(picture_id=id)
         return {"result": "Текст картинки будет проанализирован и добавлен в БД"}
     except:
         raise Exception
