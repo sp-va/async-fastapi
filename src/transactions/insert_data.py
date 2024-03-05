@@ -4,8 +4,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from db.base import SessionLocal
 from models.documents import *
 from utils.save_picture import save_picture
-from celery_worker.tasks import app
-
+from celery_config import worker
 async def upload_picture(async_session: async_sessionmaker[AsyncSession], file_id: str, file_path: str, picture: UploadFile = File(...)) -> None:
     async with async_session() as session:
         async with session.begin():
@@ -18,7 +17,7 @@ async def upload_picture(async_session: async_sessionmaker[AsyncSession], file_i
                 stmt
             )
 
-@app.task
+@worker.task
 def add_text(picture_id: str, text: str):
     sync_session = SessionLocal
     with sync_session() as session:
