@@ -10,9 +10,9 @@ services:
     command: sh -c "
        python src/main.py"
     volumes:
-      - .:/src
+      - fastapi_media:/code/src/media
     ports:
-      - "8008:8008"
+      - "8001:8000"
     depends_on:
       - database
       - rabbitmq
@@ -61,4 +61,5 @@ services:
 volumes:
    postgres_data:
    rabbitmq:
+   fastapi_media:
 
