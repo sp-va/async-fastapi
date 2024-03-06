@@ -1,16 +1,18 @@
+import time
+import pathlib
 import pytesseract
 from PIL import Image
-import time
-from celery import shared_task
+import celery_config
 
-from transactions.insert_data import add_text
-from transactions.retrieve_data import get_document_picture
+from transactions import insert_data, retrieve_data
 
-@shared_task
+
+@celery_config.worker.task
 def analyze_picture(picture_id: str):
-    file_path = get_document_picture(picture_id=picture_id)
+    print(pathlib.Path(__file__).parent)
+    file_path = retrieve_data.get_document_picture(picture_id=picture_id)
     text = pytesseract.image_to_string(Image.open(file_path), lang="rus+eng")
     time.sleep(5)
-    add_text(picture_id=picture_id, text=text)
+    insert_data.add_text(picture_id=picture_id, text=text)
     return text
 

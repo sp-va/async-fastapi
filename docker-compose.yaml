@@ -7,25 +7,26 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: fastapi-container
-    command: sh -c "
-       python src/main.py"
+    entrypoint: python src/main.py
     volumes:
-      - fastapi_media:/var/lib/fastapi/
+      - fastapi_media:/home/vadim/Documents/VScode/SQLalchemy/src/media
     ports:
       - "8001:8000"
     depends_on:
       - database
       - rabbitmq
-      - worker
 
   worker:
     build:
      context: .
      dockerfile: Dockerfile
-    command: sh -c "python src/celery_config.py"
+    command: sh -c "cd src && python celery_config.py && cd .."
     hostname: worker
+    env_file:
+      - ".env"
     depends_on:
      - rabbitmq
+     - fastapi
 
 
   database:
