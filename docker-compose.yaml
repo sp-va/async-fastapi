@@ -10,7 +10,7 @@ services:
     command: sh -c "
        python src/main.py"
     volumes:
-      - fastapi_media:/code/src/media
+      - fastapi_media:/var/lib/fastapi/
     ports:
       - "8001:8000"
     depends_on:
@@ -22,7 +22,7 @@ services:
     build:
      context: .
      dockerfile: Dockerfile
-    command: python -m celery -A src.celery_config worker
+    command: sh -c "python src/celery_config.py"
     hostname: worker
     depends_on:
      - rabbitmq

@@ -1,12 +1,12 @@
 import pytesseract
 from PIL import Image
 import time
+from celery import shared_task
 
-from celery_config import worker
 from transactions.insert_data import add_text
 from transactions.retrieve_data import get_document_picture
 
-@worker.task(name="celery_worker.tasks.analyze_picture")
+@shared_task
 def analyze_picture(picture_id: str):
     file_path = get_document_picture(picture_id=picture_id)
     text = pytesseract.image_to_string(Image.open(file_path), lang="rus+eng")
